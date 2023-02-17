@@ -1,0 +1,24 @@
+﻿@model OnlineSchoolMVCWebApp.Models.SubjectCategory
+
+@{
+    ViewData["Title"] = "Інформація";
+}
+
+<h1>Інформація</h1>
+
+<div>
+    <h4>Категорія</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a> |
+    <a asp-action="Index">Повернутися до списку категорій</a>
+</div>

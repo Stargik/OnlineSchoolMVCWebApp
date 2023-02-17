@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using OnlineSchoolMVCWebApp;
+using OnlineSchoolMVCWebApp.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<OnlineSchoolDbContext>(option => option.UseSqlServer(
+    builder.Configuration.GetConnectionString(SettingStrings.OnlineSchoolDbConnection)
+    ));
 
 var app = builder.Build();
 
@@ -22,6 +30,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=SubjectCategories}/{action=Index}/{id?}");
 
 app.Run();

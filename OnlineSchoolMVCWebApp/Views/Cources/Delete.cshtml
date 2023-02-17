@@ -1,14 +1,13 @@
 ﻿@model OnlineSchoolMVCWebApp.Models.Cource
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Видалити курс";
 }
 
-<h1>Delete</h1>
+<h1>@ViewData["Title"]</h1>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>Ви справді хочете видалити курс?</h3>
 <div>
-    <h4>Cource</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -23,35 +22,35 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Description)
         </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.SubjectCategory)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.SubjectCategory.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Level)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Level.Status)
+        </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.CreationDate)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.CreationDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Author)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Author.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Level)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Level.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SubjectCategory)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SubjectCategory.Id)
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Author.FirstName) @Html.DisplayFor(model => model.Author.LastName) | @Html.DisplayFor(model => model.Author.Email)
         </dd>
     </dl>
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <input type="submit" value="Видалити" class="btn btn-danger" /> |
+        <a asp-action="Index">Скасувати</a>
     </form>
 </div>

@@ -24,6 +24,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         {
             var onlineSchoolDbContext = context.Cources.Include(c => c.Author).Include(c => c.Level).Include(c => c.SubjectCategory);
             var courcesByCategory = await onlineSchoolDbContext.ToListAsync();
+            ViewBag.SubjectCategoryName = "Всі курси";
             if (id is not null)
             {
                 ViewBag.SubjectCategoryId = id; 
@@ -51,16 +52,15 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-
-            return RedirectToAction("Index", "Tasks", new { Id = cource.Id, Name = cource.Title });
+            return View(cource);
         }
 
         // GET: Cources/Create
         public IActionResult Create()
         {
-            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "Id");
-            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Id");
-            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Id");
+            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "LastName");
+            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Status");
+            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Name");
             return View();
         }
 
@@ -69,10 +69,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description,CreationDate")] Cource cource)
+        public async Task<IActionResult> Create([Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description")] Cource cource)
         {
             if (ModelState.IsValid)
             {
+                cource.CreationDate = DateTime.Now;
                 context.Add(cource);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -96,9 +97,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "Id", cource.AuthorId);
-            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Id", cource.LevelId);
-            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Id", cource.SubjectCategoryId);
+            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "LastName", cource.AuthorId);
+            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Status", cource.LevelId);
+            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Name", cource.SubjectCategoryId);
             return View(cource);
         }
 
@@ -107,13 +108,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description,CreationDate")] Cource cource)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description, CreationDate")] Cource cource)
         {
             if (id != cource.Id)
             {
                 return NotFound();
             }
-
             if (ModelState.IsValid)
             {
                 try

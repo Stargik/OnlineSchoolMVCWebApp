@@ -6,6 +6,7 @@ namespace OnlineSchoolMVCWebApp.Models;
 
 public partial class SubjectCategory
 {
+    [Display(Name = "Категорія")]
     public int Id { get; set; }
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Заголовок")]

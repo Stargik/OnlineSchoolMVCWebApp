@@ -20,9 +20,15 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Attachments
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? courceid)
         {
-            var onlineSchoolDbContext = context.Attachments.Include(a => a.Cource);
+            if (courceid is null)
+            {
+                return NotFound();
+            }
+            ViewBag.CourceId = courceid;
+            ViewBag.CourceTitle = (await context.Cources.FirstOrDefaultAsync(t => t.Id == courceid)).Title;
+            var onlineSchoolDbContext = context.Attachments.Where(t => t.CourceId == courceid).Include(t => t.Cource);
             return View(await onlineSchoolDbContext.ToListAsync());
         }
 
@@ -46,9 +52,13 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Attachments/Create
-        public IActionResult Create()
+        public IActionResult Create(int? courceid)
         {
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id");
+            if (courceid is null)
+            {
+                return NotFound();
+            }
+            ViewData["CourceId"] = courceid;
             return View();
         }
 
@@ -63,7 +73,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 context.Add(attachment);
                 await context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), "Tasks", new { id = attachment.CourceId });
             }
             ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", attachment.CourceId);
             return View(attachment);
@@ -116,7 +126,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { courceid = attachment.CourceId });
             }
             ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", attachment.CourceId);
             return View(attachment);
@@ -157,7 +167,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             
             await context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { courceid = attachment.CourceId });
         }
 
         private bool AttachmentExists(int id)

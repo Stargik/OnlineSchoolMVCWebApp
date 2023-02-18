@@ -32,6 +32,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             ViewBag.CourceId = id;
             ViewBag.CourceTitle = title;
+            var attachments = context.Attachments.Where(c => c.CourceId == id);
+            if (attachments.Count() != 0)
+            {
+                ViewBag.Attachments = await attachments.ToListAsync();
+            }
             var onlineSchoolDbContext = context.Tasks.Where(t => t.CourceId == id).Include(t => t.Cource);
             return View(await onlineSchoolDbContext.ToListAsync());
         }
@@ -56,8 +61,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Tasks/Create
-        public IActionResult Create(int courceid)
+        public IActionResult Create(int? courceid)
         {
+            if (courceid is null)
+            {
+                return NotFound();
+            }
             ViewData["CourceId"] = courceid;
             return View();
         }

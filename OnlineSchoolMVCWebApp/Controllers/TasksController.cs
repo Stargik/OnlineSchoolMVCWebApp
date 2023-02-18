@@ -26,6 +26,10 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return RedirectToAction("Index", "Cources");
             }
+            if (title is null)
+            {
+                title = (await context.Cources.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id)).Title;
+            }
             ViewBag.CourceId = id;
             ViewBag.CourceTitle = title;
             var onlineSchoolDbContext = context.Tasks.Where(t => t.CourceId == id).Include(t => t.Cource);
@@ -52,9 +56,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Tasks/Create
-        public IActionResult Create()
+        public IActionResult Create(int courceid)
         {
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id");
+            ViewData["CourceId"] = courceid;
             return View();
         }
 
@@ -69,7 +73,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 context.Add(task);
                 await context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { id = task.CourceId });
             }
             ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", task.CourceId);
             return View(task);
@@ -88,7 +92,6 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", task.CourceId);
             return View(task);
         }
 
@@ -122,7 +125,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { id = task.CourceId });
             }
             ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", task.CourceId);
             return View(task);
@@ -163,7 +166,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             
             await context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { id = task.CourceId });
         }
 
         private bool TaskExists(int id)

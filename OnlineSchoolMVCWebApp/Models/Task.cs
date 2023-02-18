@@ -10,10 +10,12 @@ public partial class Task
     [Display(Name = "Курс")]
     public int CourceId { get; set; }
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
-    [Display(Name = "Завдання")]
+    [Display(Name = "Заголовок")]
     public string Title { get; set; } = null!;
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Контент")]
     public string TaskContent { get; set; } = null!;
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Порядок сортування")]
     public int SortOrder { get; set; }
 

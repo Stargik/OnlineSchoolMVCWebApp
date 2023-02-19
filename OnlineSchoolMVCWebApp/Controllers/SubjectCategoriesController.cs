@@ -22,6 +22,10 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // GET: SubjectCategories
         public async Task<IActionResult> Index()
         {
+            if (TempData["ErrorMessage"] is not null)
+            {
+                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+            }
               return context.SubjectCategories != null ? 
                           View(await context.SubjectCategories.ToListAsync()) :
                           Problem("Entity set 'OnlineSchoolDbContext.SubjectCategories'  is null.");
@@ -143,6 +147,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
             if (context.SubjectCategories == null)
             {
                 return Problem("Entity set 'OnlineSchoolDbContext.SubjectCategories'  is null.");
+            }  
+            var courcesBySubjectCategory = await context.Cources.Where(c => c.SubjectCategoryId == id).ToListAsync();
+            if (courcesBySubjectCategory.Any())
+            {
+                TempData["ErrorMessage"] = "Помилка. Неможливо видалити категорію, яка містить курси.";
+                return RedirectToAction(nameof(Index));
             }
             var subjectCategory = await context.SubjectCategories.FindAsync(id);
             if (subjectCategory != null)

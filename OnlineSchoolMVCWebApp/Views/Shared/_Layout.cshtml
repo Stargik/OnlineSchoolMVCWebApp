@@ -39,6 +39,12 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            @if (@ViewData["ErrorMessage"] is not null)
+            {
+                <div>
+                    <p class="text-danger">@ViewData["ErrorMessage"]</p>
+                </div>
+            }
             @RenderBody()
         </main>
     </div>

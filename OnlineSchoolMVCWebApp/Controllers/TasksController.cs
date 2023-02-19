@@ -37,7 +37,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 ViewBag.Attachments = await attachments.ToListAsync();
             }
-            var onlineSchoolDbContext = context.Tasks.Where(t => t.CourceId == id).Include(t => t.Cource);
+            var onlineSchoolDbContext = context.Tasks.Where(t => t.CourceId == id).Include(t => t.Cource).OrderBy(t => t.CourceId).ThenBy(t => t.SortOrder);
             return View(await onlineSchoolDbContext.ToListAsync());
         }
 

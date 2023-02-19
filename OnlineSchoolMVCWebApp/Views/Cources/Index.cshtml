@@ -1,41 +1,39 @@
 ﻿@model IEnumerable<OnlineSchoolMVCWebApp.Models.Cource>
 
 @{
-    ViewData["Title"] = "Список курсів";
+    ViewData["Title"] = @ViewBag.SubjectCategoryName;
 }
 
-<h1>@ViewData["Title"] - @ViewBag.SubjectCategoryName</h1>
-<hr />
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Level)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Level.Status)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Докладніше</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
-<p>
-    <a asp-action="Create">Створити курс</a>
-</p>
+<h1 class="display-6 m-3">@ViewData["Title"]</h1>
+
+<div class="container ">
+    <div class="row row-cols-1 row-cols-md-3 row-cols-sm-2  text-center">
+        @foreach (var item in Model)
+        {
+            <div class="col mb-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mt-2">@Html.DisplayFor(modelItem => item.Title)</h5>
+                    </div>
+                    <div class="card-body p-2 pb-3">
+
+                        <p class="card-text">@Html.DisplayNameFor(model => model.SubjectCategory.Id): @Html.DisplayFor(modelItem => item.SubjectCategory.Name)</p>
+                        <p class="card-text">@Html.DisplayNameFor(model => model.Level): @Html.DisplayFor(modelItem => item.Level.Status)</p>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark">Редагувати</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark">Докладніше</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark">Видалити</a>
+                    </div>
+                </div>
+            </div>
+
+        }
+    </div>
+    <div class="row row-cols-12 mt-2">
+        <div class="col">
+            <p>
+                <a asp-action="Create" class="btn btn-outline-secondary">Створити курс</a>
+            </p>
+        </div>
+
+    </div>
+</div>

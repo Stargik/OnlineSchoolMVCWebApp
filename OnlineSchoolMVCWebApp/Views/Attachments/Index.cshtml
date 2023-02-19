@@ -28,14 +28,15 @@
                 @Html.DisplayFor(modelItem => item.Link)
             </td>
             <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-courceid="@item.CourceId">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Докладніше</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@item.Id" asp-route-courceid="@item.CourceId">Редагувати</a> 
+                <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@item.Id">Докладніше</a> 
+                <a class="btn btn-outline-dark" asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
 <p>
-    <a asp-action="Create" asp-route-courceid="@ViewBag.CourceId">Створити додатковий матеріал</a>
+    <a class="btn btn-outline-secondary" asp-controller="Tasks" asp-action="Index" asp-route-id="@ViewBag.CourceId">Повернутись до курсу</a>
+    <a class="btn btn-outline-secondary" asp-action="Create" asp-route-courceid="@ViewBag.CourceId">Створити додатковий матеріал</a>
 </p>

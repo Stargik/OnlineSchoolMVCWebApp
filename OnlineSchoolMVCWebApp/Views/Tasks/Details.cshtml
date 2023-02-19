@@ -11,6 +11,6 @@
     <p>@Html.DisplayFor(model => model.TaskContent)</p>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a> |
-    <a asp-action="Index" asp-route-id="@Model?.CourceId">Список завдань</a>
+    <a asp-action="Index" class="btn btn-outline-secondary" asp-route-id="@Model?.CourceId">Список завдань</a>
+    <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редагувати</a> 
 </div>

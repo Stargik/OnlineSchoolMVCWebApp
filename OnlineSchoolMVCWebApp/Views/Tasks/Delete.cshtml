@@ -38,7 +38,7 @@
     
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Видалити" class="btn btn-danger" /> |
-        <a asp-action="Index" asp-route-id="@Model?.CourceId">Скасувати</a>
+        <input type="submit" value="Видалити" class="btn btn-danger" /> 
+        <a asp-action="Index" asp-route-id="@Model?.CourceId" class="btn btn-primary">Скасувати</a>
     </form>
 </div>

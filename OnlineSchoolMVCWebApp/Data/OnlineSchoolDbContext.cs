@@ -39,7 +39,7 @@ public partial class OnlineSchoolDbContext : DbContext
 
             entity.HasOne(d => d.Cource).WithMany(p => p.Attachments)
                 .HasForeignKey(d => d.CourceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Attachments_Cources");
         });
 
@@ -67,7 +67,7 @@ public partial class OnlineSchoolDbContext : DbContext
 
             entity.HasOne(d => d.SubjectCategory).WithMany(p => p.Cources)
                 .HasForeignKey(d => d.SubjectCategoryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Cources_SubjectCategories");
         });
 
@@ -87,7 +87,7 @@ public partial class OnlineSchoolDbContext : DbContext
 
             entity.HasOne(d => d.Cource).WithMany(p => p.Tasks)
                 .HasForeignKey(d => d.CourceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Tasks_Cources");
         });
 

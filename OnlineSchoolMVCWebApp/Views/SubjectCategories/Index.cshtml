@@ -23,14 +23,14 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Список курсів</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@item.Id">Список курсів</a>
+                <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> 
+                <a class="btn btn-outline-dark" asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
 <p>
-    <a asp-action="Create">Створити нову категорію</a>
+    <a class="btn btn-outline-secondary" asp-action="Create">Створити нову категорію</a>
 </p>

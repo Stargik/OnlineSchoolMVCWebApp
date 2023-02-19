@@ -8,7 +8,7 @@
 
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
@@ -38,15 +38,12 @@
                 <span asp-validation-for="AuthorId" class="text-danger"></span>
             </div>
             <input type="hidden" asp-for="CreationDate" />
-            <div class="form-group">
-                <input type="submit" value="Зберегти" class="btn btn-primary" />
+            <div class="form-group mt-1">
+                <input type="submit" value="Зберегти" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-danger">Скасувати</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Скасувати</a>
 </div>
 
 @section Scripts {

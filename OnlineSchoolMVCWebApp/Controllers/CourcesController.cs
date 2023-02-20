@@ -61,6 +61,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
             ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "LastName");
             ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Status");
             ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Name");
+            if (!context.SubjectCategories.Any())
+            {
+                TempData["ErrorMessage"] = "Необхідна попередня наявність хоча б однієї каттегорії.";
+                return RedirectToAction(nameof(Index));
+            }
             return View();
         }
 

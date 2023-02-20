@@ -34,7 +34,6 @@ public partial class OnlineSchoolDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK_Books");
 
-            entity.Property(e => e.Link).HasMaxLength(100);
             entity.Property(e => e.Title).HasMaxLength(50);
 
             entity.HasOne(d => d.Cource).WithMany(p => p.Attachments)

@@ -69,6 +69,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CourceId,Title,Link")] Attachment attachment)
         {
+            if (attachment.Title.Length > 50)
+            {
+                TempData["ErrorMessage"] = "Максимальна кількість символів для заголовку: 50";
+                return RedirectToAction(nameof(Create), new { courceid = attachment.CourceId });
+            }
             if (ModelState.IsValid)
             {
                 context.Add(attachment);
@@ -107,7 +112,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-
+            if (attachment.Title.Length > 50)
+            {
+                TempData["ErrorMessage"] = "Максимальна кількість символів для заголовку: 50";
+                return RedirectToAction(nameof(Edit), new { Id = id });
+            }
             if (ModelState.IsValid)
             {
                 try

@@ -22,10 +22,6 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // GET: SubjectCategories
         public async Task<IActionResult> Index()
         {
-            if (TempData["ErrorMessage"] is not null)
-            {
-                ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-            }
               return context.SubjectCategories != null ? 
                           View(await context.SubjectCategories.ToListAsync()) :
                           Problem("Entity set 'OnlineSchoolDbContext.SubjectCategories'  is null.");
@@ -61,6 +57,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name")] SubjectCategory subjectCategory)
         {
+            if (subjectCategory.Name.Length > 50)
+            {
+                TempData["ErrorMessage"] = "Максимальна кількість символів: 50";
+                return RedirectToAction(nameof(Create));
+            }
             if (ModelState.IsValid)
             {
                 context.Add(subjectCategory);
@@ -97,7 +98,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-
+            if (subjectCategory.Name.Length > 50)
+            {
+                TempData["ErrorMessage"] = "Максимальна кількість символів: 50";
+                return RedirectToAction(nameof(Edit), new { Id = id });
+            }
             if (ModelState.IsValid)
             {
                 try

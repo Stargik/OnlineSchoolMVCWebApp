@@ -45,7 +45,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: SubjectCategories/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             return View();
         }
@@ -64,7 +64,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             if (ModelState.IsValid)
             {
-                context.Add(subjectCategory);
+                await context.AddAsync(subjectCategory);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }

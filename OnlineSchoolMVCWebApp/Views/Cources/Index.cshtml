@@ -12,7 +12,7 @@
         @foreach (var item in Model)
         {
             <div class="col mb-2">
-                <div class="card">
+                <div class="card border-dark">
                     <div class="card-header">
                         <h5 class="mt-2">@Html.DisplayFor(modelItem => item.Title)</h5>
                     </div>
@@ -20,9 +20,9 @@
 
                         <p class="card-text">@Html.DisplayNameFor(model => model.SubjectCategory.Id): @Html.DisplayFor(modelItem => item.SubjectCategory.Name)</p>
                         <p class="card-text">@Html.DisplayNameFor(model => model.Level): @Html.DisplayFor(modelItem => item.Level.Status)</p>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark">Редагувати</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark">Докладніше</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark">Видалити</a>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Редагувати</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Докладніше</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Видалити</a>
                     </div>
                 </div>
             </div>

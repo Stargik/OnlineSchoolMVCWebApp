@@ -1,6 +1,6 @@
 ﻿namespace OnlineSchoolMVCWebApp
 {
-    public class SettingStrings
+    public static class SettingStrings
     {
         public const string OnlineSchoolDbConnection = "OnlineSchoolDbConnection";
 

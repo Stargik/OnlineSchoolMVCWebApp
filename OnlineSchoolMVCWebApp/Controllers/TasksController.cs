@@ -33,7 +33,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             ViewBag.CourceId = id;
             ViewBag.CourceTitle = title;
             var attachments = context.Attachments.Where(c => c.CourceId == id);
-            if (attachments.Count() != 0)
+            if (await attachments.CountAsync() != 0)
             {
                 ViewBag.Attachments = await attachments.ToListAsync();
             }
@@ -61,7 +61,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Tasks/Create
-        public IActionResult Create(int? courceid)
+        public async Task<IActionResult> Create(int? courceid)
         {
             if (courceid is null)
             {
@@ -78,6 +78,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,CourceId,Title,TaskContent,SortOrder")] Models.Task task)
         {
+            var cources = await context.Cources.ToListAsync();
             if (task.Title.Length > 50)
             {
                 TempData["ErrorMessage"] = "Максимальна кількість символів для заголовку: 50";
@@ -85,11 +86,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             if (ModelState.IsValid)
             {
-                context.Add(task);
+                await context.AddAsync(task);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), new { id = task.CourceId });
             }
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", task.CourceId);
+            ViewData["CourceId"] = new SelectList(cources, "Id", "Id", task.CourceId);
             return View(task);
         }
 
@@ -116,6 +117,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CourceId,Title,TaskContent,SortOrder")] Models.Task task)
         {
+            var cources = await context.Cources.ToListAsync();
             if (id != task.Id)
             {
                 return NotFound();
@@ -145,7 +147,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index), new { id = task.CourceId });
             }
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", task.CourceId);
+            ViewData["CourceId"] = new SelectList(cources, "Id", "Id", task.CourceId);
             return View(task);
         }
 

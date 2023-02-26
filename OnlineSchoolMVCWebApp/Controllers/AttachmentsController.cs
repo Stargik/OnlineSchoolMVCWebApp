@@ -52,7 +52,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Attachments/Create
-        public IActionResult Create(int? courceid)
+        public async Task<IActionResult> Create(int? courceid)
         {
             if (courceid is null)
             {
@@ -87,6 +87,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // GET: Attachments/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var cources = await context.Cources.ToListAsync();
             if (id == null || context.Attachments == null)
             {
                 return NotFound();
@@ -97,7 +98,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", attachment.CourceId);
+            ViewData["CourceId"] = new SelectList(cources, "Id", "Id", attachment.CourceId);
             return View(attachment);
         }
 
@@ -108,6 +109,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CourceId,Title,Link")] Attachment attachment)
         {
+            var cources = await context.Cources.ToListAsync();
             if (id != attachment.Id)
             {
                 return NotFound();
@@ -137,7 +139,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index), new { courceid = attachment.CourceId });
             }
-            ViewData["CourceId"] = new SelectList(context.Cources, "Id", "Id", attachment.CourceId);
+            ViewData["CourceId"] = new SelectList(cources, "Id", "Id", attachment.CourceId);
             return View(attachment);
         }
 

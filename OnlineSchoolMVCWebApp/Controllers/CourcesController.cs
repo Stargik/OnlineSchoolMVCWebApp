@@ -56,12 +56,16 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Cources/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "LastName");
-            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Status");
-            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Name");
-            if (!context.SubjectCategories.Any())
+            var authors = await context.Authors.ToListAsync();
+            var levels = await context.Levels.ToListAsync();
+            var subjectCategories = await context.SubjectCategories.ToListAsync();
+
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
+            ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
+            ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
+             if (!(await context.SubjectCategories.AnyAsync()))
             {
                 TempData["ErrorMessage"] = "Необхідна попередня наявність хоча б однієї каттегорії.";
                 return RedirectToAction(nameof(Index));
@@ -76,6 +80,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description")] Cource cource)
         {
+            var authors = await context.Authors.ToListAsync();
+            var levels = await context.Levels.ToListAsync();
+            var subjectCategories = await context.SubjectCategories.ToListAsync();
             if (cource.Title.Length > 50)
             {
                 TempData["ErrorMessage"] = "Максимальна кількість символів для назви: 50";
@@ -84,19 +91,22 @@ namespace OnlineSchoolMVCWebApp.Controllers
             if (ModelState.IsValid)
             {
                 cource.CreationDate = DateTime.Now;
-                context.Add(cource);
+                await context.AddAsync(cource);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "Id", cource.AuthorId);
-            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Id", cource.LevelId);
-            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Id", cource.SubjectCategoryId);
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
+            ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
+            ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
             return View(cource);
         }
 
         // GET: Cources/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            var authors = await context.Authors.ToListAsync();
+            var levels = await context.Levels.ToListAsync();
+            var subjectCategories = await context.SubjectCategories.ToListAsync();
             if (id == null || context.Cources == null)
             {
                 return NotFound();
@@ -107,9 +117,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "LastName", cource.AuthorId);
-            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Status", cource.LevelId);
-            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Name", cource.SubjectCategoryId);
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
+            ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
+            ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
             return View(cource);
         }
 
@@ -120,6 +130,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description, CreationDate")] Cource cource)
         {
+            var authors = await context.Authors.ToListAsync();
+            var levels = await context.Levels.ToListAsync();
+            var subjectCategories = await context.SubjectCategories.ToListAsync();
             if (id != cource.Id)
             {
                 return NotFound();
@@ -149,9 +162,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(context.Authors, "Id", "Id", cource.AuthorId);
-            ViewData["LevelId"] = new SelectList(context.Levels, "Id", "Id", cource.LevelId);
-            ViewData["SubjectCategoryId"] = new SelectList(context.SubjectCategories, "Id", "Id", cource.SubjectCategoryId);
+            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
+            ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
+            ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
             return View(cource);
         }
 

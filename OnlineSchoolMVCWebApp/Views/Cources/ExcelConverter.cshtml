@@ -1,0 +1,42 @@
+﻿@model IEnumerable<OnlineSchoolMVCWebApp.Models.Attachment>
+
+@{
+    ViewData["Title"] = "Excel converter";
+}
+
+<h1 class="display-6 m-3">@ViewData["Title"]</h1>
+
+<div class="container ">
+    <div class="row row-cols-2 mt-2">
+        <div class="col">
+            <form asp-action="ExportXl">
+                <legend>Вивантажте курси до excel-файлу</legend>
+                <div class="form-group">
+                    <label for="fileExcel" class="form-label">Курси:</label>
+                    <select name="courceIds" class="form-select" multiple="" asp-items="ViewBag.CourcesId"></select>
+                </div>
+                <input class="btn btn-primary mt-2" type="submit" value="Вивантажити" />
+            </form>
+        </div>
+        <div class="col">
+            @using (Html.BeginForm("ImportXl", "Cources", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+            {
+                <legend>Завантажте курси з excel-файлу</legend>
+                <div class="form-group">
+                    <label for="fileExcel" class="form-label">Excel-файл:</label>
+                    <input class="form-control" type="file" name="fileExcel" id="fileExcel" required>
+                </div>
+                <input class="btn btn-primary mt-2" type="submit" value="Завантажити" />
+            }
+        </div>
+    </div>
+
+    <div class="row row-cols-1 mt-2">
+        <div class="col">
+            <p>
+                <a class="btn btn-outline-secondary" asp-controller="Cources" asp-action="Index">Список курсів</a>
+            </p>
+        </div>
+    </div>
+</div>
+

@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineSchoolMVCWebApp.Data;
 using OnlineSchoolMVCWebApp.Models;
+using OnlineSchoolMVCWebApp.Services;
 
 namespace OnlineSchoolMVCWebApp.Controllers
 {
     public class CourcesController : Controller
     {
         private readonly OnlineSchoolDbContext context;
-
-        public CourcesController(OnlineSchoolDbContext context)
+        private readonly ExcelService excelService;
+        public CourcesController(OnlineSchoolDbContext context, ExcelService excelService)
         {
             this.context = context;
+            this.excelService = excelService;
         }
 
         // GET: Cources
@@ -206,6 +210,53 @@ namespace OnlineSchoolMVCWebApp.Controllers
             
             await context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> ExcelConverter()
+        {
+            var cources = await context.Cources.ToListAsync();
+            ViewData["CourcesId"] = new SelectList(cources, "Id", "Title");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportXl(IFormFile fileExcel)
+        {
+            if (ModelState.IsValid)
+            {
+                Author author = await context.Authors.FirstOrDefaultAsync();
+                try
+                {
+                    await excelService.CreateCourcesByExcelFile(fileExcel, author);
+                }
+                catch (Exception)
+                {
+
+                    return BadRequest();
+                }
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExportXl(List<int> courceIds)
+        {
+            if (ModelState.IsValid)
+            {
+                var cources = await context.Cources.Where(c => courceIds.Contains(c.Id)).ToListAsync();
+                try
+                {
+                    return await excelService.CreateExcelFileByCources(cources);
+                }
+                catch (Exception)
+                {
+
+                    return BadRequest();
+                }
+            }
+            return RedirectToAction(nameof(ExcelConverter));
         }
 
         private bool CourceExists(int id)

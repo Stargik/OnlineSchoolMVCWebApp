@@ -34,6 +34,30 @@
                     </ul>
                 </div>
             </div>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="d-flex text-muted">
+                    @User.Identity.Name
+                </div>
+                <form class="d-flex" method="post" asp-controller="Account" asp-action="Logout">
+                    <input class="btn btn-secondary m-2 my-sm-0" type="submit" value="Вихід" />
+                </form>
+            }
+            else
+            {
+                    <ul class="navbar-nav" >
+                        <li class="nav-item">
+                        <a class="btn btn-secondary m-2 my-sm-0" asp-area="" asp-controller="Account" asp-action="Register">Реєстрація</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="btn btn-secondary m-2 my-sm-0" asp-area="" asp-controller="Account" asp-action="Login">Авторизація</a>
+                        </li>
+                    </ul>
+            }
+
+
+
         </nav>
     </header>
     <div class="container">

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Identity;
 using OnlineSchoolMVCWebApp.Models;
 using Task = System.Threading.Tasks.Task;
 
@@ -21,12 +22,15 @@ namespace OnlineSchoolMVCWebApp
             {
                 await roleManager.CreateAsync(new IdentityRole("author"));
             }
+
             if (await userManager.FindByNameAsync(adminEmail) == null)
             {
                 User admin = new User { Email = adminEmail, UserName = adminEmail, FirstName = adminEmail, LastName = adminEmail };
                 IdentityResult result = await userManager.CreateAsync(admin, password);
                 if (result.Succeeded)
                 {
+                    var code = await userManager.GenerateEmailConfirmationTokenAsync(admin);
+                    await userManager.ConfirmEmailAsync(admin, code);
                     await userManager.AddToRoleAsync(admin, "admin");
                 }
             }

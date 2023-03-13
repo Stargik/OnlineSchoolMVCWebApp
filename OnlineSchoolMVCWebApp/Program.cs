@@ -12,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<ExcelService>();
 
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection(nameof(MailSettings)));
+builder.Services.AddTransient<EmailService>();
+
+
 builder.Services.AddDbContext<OnlineSchoolDbContext>(option => option.UseSqlServer(
     builder.Configuration.GetConnectionString(SettingStrings.OnlineSchoolDbConnection)
 ));
@@ -20,7 +24,7 @@ builder.Services.AddDbContext<IdentityOnlineSchoolDbContext>(option => option.Us
     builder.Configuration.GetConnectionString(SettingStrings.IdentityOnlineSchoolDbConnection)
     ));
 
-builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<IdentityOnlineSchoolDbContext>();
+builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<IdentityOnlineSchoolDbContext>().AddDefaultTokenProviders();
 
 
 var app = builder.Build();

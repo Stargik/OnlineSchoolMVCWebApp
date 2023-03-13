@@ -11,11 +11,12 @@ namespace OnlineSchoolMVCWebApp.ViewModels
         [Display(Name = "Старий пароль")]
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "Поле не повинно бути порожнім")]
-        public string NewPassword { get; set; }
+        public string OldPassword { get; set; }
         [Display(Name = "Новий пароль")]
         [DataType(DataType.Password)]
         [Required(ErrorMessage = "Поле не повинно бути порожнім")]
-        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
+
 
     }
 }

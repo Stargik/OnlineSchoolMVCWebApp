@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineSchoolMVCWebApp.Models;
+using OnlineSchoolMVCWebApp.Services;
 using OnlineSchoolMVCWebApp.ViewModels;
 using System.Security.Claims;
 
@@ -11,11 +13,13 @@ namespace OnlineSchoolMVCWebApp.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
+        private readonly EmailService emailService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, EmailService emailService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.emailService = emailService;
         }
 
         [HttpGet]
@@ -41,8 +45,16 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, false);
-                    return RedirectToAction("Index", "Home");
+                    var code = await userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.Action(
+                        "ConfirmEmail",
+                        "Account",
+                        new { userId = user.Id, code = code },
+                        protocol: HttpContext.Request.Scheme);
+
+                    await emailService.SendEmailAsync(model.Email, "Підтвердження Email", $"Для підтвердження реєстрації перейдіть за посиланням: <a href='{callbackUrl}'>link</a>");
+
+                    return View("SuccessRegistration");
                 }
                 else
                 {
@@ -57,6 +69,31 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return View("Error");
+            }
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return View("Error");
+            }
+            var result = await userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(user, "author");
+                await signInManager.SignInAsync(user, false);
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View("Error");
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Login(string returnUrl = null)
         {
             return View(new LoginViewModel { ReturnUrl = returnUrl });
@@ -68,6 +105,15 @@ namespace OnlineSchoolMVCWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
+                var user = await userManager.FindByNameAsync(model.Email);
+                if (user != null)
+                {
+                    if (!await userManager.IsEmailConfirmedAsync(user))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ви не підтвердили свій email.");
+                        return View(model);
+                    }
+                }
                 var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {

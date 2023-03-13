@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Користувач";
+    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+}
+
+<h1 class="display-6 m-3">@ViewData["Title"] - @User.Identity.Name</h1>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a class="btn btn-outline-secondary" asp-action="ChangePassword" >Змінити пароль</a>
+        @if (User.IsInRole(SettingStrings.AdminRole))
+        {
+            <a class="btn btn-outline-secondary" asp-controller="Roles" asp-action="Index">Налаштування ролей</a>
+        }
+    </p>
+}

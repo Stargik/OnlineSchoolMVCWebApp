@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineSchoolMVCWebApp.Models;
 using OnlineSchoolMVCWebApp.ViewModels;
+using System.Security.Claims;
 
 namespace OnlineSchoolMVCWebApp.Controllers
 {
@@ -17,6 +19,13 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Register()
         {
             return View();
@@ -28,11 +37,10 @@ namespace OnlineSchoolMVCWebApp.Controllers
             if (ModelState.IsValid)
             {
                 User user = new User { Email = model.Email, UserName = model.Email, FirstName = model.FirstName, LastName = model.LastName };
-                // додаємо користувача
+
                 var result = await userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // установка кукі
                     await signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
@@ -44,6 +52,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
                     }
                 }
             }
+
             return View(model);
         }
 
@@ -85,6 +94,48 @@ namespace OnlineSchoolMVCWebApp.Controllers
         {
             await signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
+        }
+        [Authorize]
+        public async Task<IActionResult> ChangePassword()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            User user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            ChangePasswordViewModel model = new ChangePasswordViewModel { Id = user.Id, Email = user.Email };
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await userManager.FindByIdAsync(model.Id);
+                if (user != null)
+                {
+                    IdentityResult result = await userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, "Неправильний пароль");
+                        }
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Користувача не знайдено");
+                }
+            }
+            return View(model);
         }
 
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +46,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: SubjectCategories/Create
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Create()
         {
             return View();
@@ -55,6 +57,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Create([Bind("Id,Name")] SubjectCategory subjectCategory)
         {
             if (subjectCategory.Name.Length > 50)
@@ -72,6 +75,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: SubjectCategories/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || context.SubjectCategories == null)
@@ -92,6 +96,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] SubjectCategory subjectCategory)
         {
             if (id != subjectCategory.Id)
@@ -127,6 +132,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: SubjectCategories/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || context.SubjectCategories == null)
@@ -147,6 +153,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // POST: SubjectCategories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (context.SubjectCategories == null)

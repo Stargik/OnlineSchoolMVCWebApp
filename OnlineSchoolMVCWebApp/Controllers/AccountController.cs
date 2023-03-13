@@ -16,11 +16,6 @@ namespace OnlineSchoolMVCWebApp.Controllers
             this.signInManager = signInManager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         [HttpGet]
         public async Task<IActionResult> Register()
         {

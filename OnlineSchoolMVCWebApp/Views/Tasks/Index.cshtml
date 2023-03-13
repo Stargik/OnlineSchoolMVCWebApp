@@ -7,18 +7,22 @@
 <h1>@ViewBag.CourceTitle</h1>
 <table class="table table-striped border">
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark">Читати</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark">Редагувати</a> 
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark">Видалити</a>
-            </td>
-        </tr>
-}
+                    @if (User.Identity.IsAuthenticated && (User.Identity.Name == @ViewBag.CourceAuthor.Email || User.IsInRole(SettingStrings.AdminRole)))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark">Редагувати</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark">Видалити</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 @if (ViewBag.Attachments is not null)
@@ -27,18 +31,21 @@
     <ul class="list-group list-group-flush border mb-2">
         @foreach (Attachment item in ViewBag.Attachments)
         {
-            <li class ="list-group-item">
+            <li class="list-group-item">
                 <a class="link-dark" href="@Html.DisplayFor(model => item.Link)" target="_blank">
                     @Html.DisplayFor(model => item.Title)
                 </a>
             </li>
-            
+
         }
     </ul>
 }
 <p>
     <a class="btn btn-outline-secondary" asp-controller="Cources" asp-action="Index">Список курсів</a>
-    <a class="btn btn-outline-secondary" asp-action="Create" asp-route-courceid="@ViewBag.CourceId">Створити завдання</a>
-    <a class="btn btn-outline-secondary" asp-controller="Attachments" asp-action="Create" asp-route-courceid="@ViewBag.CourceId">Створити додатковий матеріал</a>
-    <a class="btn btn-outline-secondary" asp-controller="Attachments" asp-action="Index" asp-route-courceid="@ViewBag.CourceId">Редагувати додаткові матерали</a>
+    @if (User.Identity.IsAuthenticated && (User.Identity.Name == @ViewBag.CourceAuthor.Email || User.IsInRole(SettingStrings.AdminRole)))
+    {
+        <a class="btn btn-outline-secondary" asp-action="Create" asp-route-courceid="@ViewBag.CourceId">Створити завдання</a>
+        <a class="btn btn-outline-secondary" asp-controller="Attachments" asp-action="Create" asp-route-courceid="@ViewBag.CourceId">Створити додатковий матеріал</a>
+        <a class="btn btn-outline-secondary" asp-controller="Attachments" asp-action="Index" asp-route-courceid="@ViewBag.CourceId">Редагувати додаткові матерали</a>
+    }
 </p>

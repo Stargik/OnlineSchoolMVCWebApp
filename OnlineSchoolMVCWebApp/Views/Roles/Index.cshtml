@@ -1,0 +1,20 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityRole>
+@{
+    ViewData["Title"] = "Список ролей";
+    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
+}
+
+<h1 class="display-6" >@ViewData["Title"]</h1>
+<hr />
+<table class="table">
+    @foreach (var role in Model)
+    {
+        <tr>
+            <td>@role.Name</td>
+        </tr>
+    }
+</table>
+
+<p>
+    <a class="btn btn-outline-secondary" asp-action="UserList" >Список користувачів</a>
+</p>

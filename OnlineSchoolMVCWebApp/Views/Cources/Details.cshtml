@@ -7,7 +7,7 @@
 <h1>@ViewData["Title"]</h1>
 <div class="container">
     <div class="row">
-        
+
         <div class="col-xs-12 col-sm-12 col-md-7 col-xl-7 col-lg-7 border p-3">
             <h4>@Html.DisplayNameFor(model => model.Description)</h4>
             <p>@Html.DisplayFor(model => model.Description)</p>
@@ -45,22 +45,21 @@
                         @Html.DisplayNameFor(model => model.Author)
                     </dt>
                     <dd class="col-sm-6">
-                        @Html.DisplayFor(model => model.Author.FirstName) @Html.DisplayFor(model => model.Author.LastName) | 
+                        @Html.DisplayFor(model => model.Author.FirstName) @Html.DisplayFor(model => model.Author.LastName) |
                         <a class="link-dark" href="mailto:@Html.DisplayFor(model => model.Author.Email)">@Html.DisplayFor(model => model.Author.Email)</a>
                     </dd>
                 </dl>
             </div>
         </div>
-  </div>
+    </div>
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-xl-12 col-lg-12 p-0 mt-2">
             <a class="btn btn-outline-secondary" asp-action="Index">Список курсів</a>
             <a class="btn btn-outline-secondary" asp-controller="Tasks" asp-action="Index" asp-route-id="@Model?.Id" asp-route-title="@Model?.Title">Розпочати навчання</a>
-            <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@Model?.Id" >Редагувати</a>
+            @if (User.Identity.IsAuthenticated && (User.Identity.Name == Model?.Author.Email || User.IsInRole(SettingStrings.AdminRole)))
+            {
+                <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a>
+            }
         </div>
     </div>
-</div>
-
-<div>
-    
 </div>

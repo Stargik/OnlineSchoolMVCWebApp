@@ -13,6 +13,7 @@
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="AuthorId" />
             <div class="form-group">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="form-control" />
@@ -32,11 +33,6 @@
                 <label asp-for="LevelId" class="control-label"></label>
                 <select asp-for="LevelId" class="form-control" asp-items="ViewBag.LevelId"></select>
                 <span asp-validation-for="LevelId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AuthorId" class="control-label"></label>
-                <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.AuthorId"></select>
-                <span asp-validation-for="AuthorId" class="text-danger"></span>
             </div>
             <input type="hidden" asp-for="CreationDate" />
             <div class="form-group mt-1">

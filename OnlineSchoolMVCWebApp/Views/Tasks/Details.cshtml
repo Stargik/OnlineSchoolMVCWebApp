@@ -12,5 +12,8 @@
 </div>
 <div>
     <a asp-action="Index" class="btn btn-outline-secondary" asp-route-id="@Model?.CourceId">Список завдань</a>
-    <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редагувати</a> 
+    @if (User.Identity.IsAuthenticated && (User.Identity.Name == @ViewBag.CourceAuthor.Email || User.IsInRole(SettingStrings.AdminRole)))
+    {
+        <a asp-action="Edit" class="btn btn-outline-secondary" asp-route-id="@Model?.Id">Редагувати</a>
+    }
 </div>

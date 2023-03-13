@@ -18,20 +18,27 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@item.Id">Список курсів</a>
-                <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@item.Id">Редагувати</a> 
-                <a class="btn btn-outline-dark" asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@item.Id">Список курсів</a>
+                    @if (User.Identity.IsAuthenticated && User.IsInRole(SettingStrings.AdminRole))
+                    {
+                        <a class="btn btn-outline-dark" asp-action="Edit" asp-route-id="@item.Id">Редагувати</a>
+                        <a class="btn btn-outline-dark" asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
-<p>
-    <a class="btn btn-outline-secondary" asp-action="Create">Створити нову категорію</a>
-</p>
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a class="btn btn-outline-secondary" asp-action="Create">Створити нову категорію</a>
+    </p>
+}

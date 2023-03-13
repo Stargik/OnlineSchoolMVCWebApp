@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model OnlineSchoolMVCWebApp.ViewModels.ChangeRoleViewModel
+
+@{
+    ViewData["Title"] = "Редагування ролей для користувача";
+}
+
+<h1 class="display-6" >@ViewData["Title"] - @Model.UserEmail</h1>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" name="userId" value="@Model.UserId" />
+            <fieldset class="form-group">
+                @foreach (IdentityRole role in Model.AllRoles)
+                {
+                    <div class="form-check">
+                        <input type="checkbox" name="roles" value="@role.Name" value="@role.Name" @(Model.UserRoles.Contains(role.Name) ? "checked=\"checked\"" : ""))
+                        class="form-check-input" />
+                        <label class="form-check-label">@role.Name</label>
+                    </div>
+                }
+            </fieldset>
+            <div class="form-group mt-1">
+                <input type="submit" value="Зберегти" class="btn btn-success" />
+                <a asp-action="Index" class="btn btn-danger">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>

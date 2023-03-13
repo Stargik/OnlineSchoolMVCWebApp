@@ -1,0 +1,18 @@
+﻿@model IEnumerable<OnlineSchoolMVCWebApp.Models.User>
+@{
+    ViewData["Title"] = "Список користувачів";
+}
+
+<h1 class="display-6" >@ViewData["Title"]</h1>
+<hr />
+<table class="table">
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.Email</td>
+            <td>
+                <a class="btn btn-outline-dark" asp-action="Edit" asp-route-userid="@user.Id">Права доступу</a>
+            </td>
+        </tr>
+    }
+</table>

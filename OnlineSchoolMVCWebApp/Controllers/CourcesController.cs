@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.InkML;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +19,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
     {
         private readonly OnlineSchoolDbContext context;
         private readonly ExcelService excelService;
-        public CourcesController(OnlineSchoolDbContext context, ExcelService excelService)
+        private readonly UserManager<User> userManager;
+        public CourcesController(OnlineSchoolDbContext context, ExcelService excelService, UserManager<User> userManager)
         {
             this.context = context;
             this.excelService = excelService;
+            this.userManager = userManager;
         }
 
         // GET: Cources
@@ -60,13 +64,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Cources/Create
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Create()
         {
-            var authors = await context.Authors.ToListAsync();
             var levels = await context.Levels.ToListAsync();
             var subjectCategories = await context.SubjectCategories.ToListAsync();
 
-            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
             ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
             ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
              if (!(await context.SubjectCategories.AnyAsync()))
@@ -82,9 +85,15 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description")] Cource cource)
+        [Authorize(Roles = "admin, author")]
+        public async Task<IActionResult> Create([Bind("Id,SubjectCategoryId,LevelId,Title,Description")] Cource cource)
         {
-            var authors = await context.Authors.ToListAsync();
+            Author author = await context.Authors.FirstOrDefaultAsync(a => a.Email == User.Identity.Name);
+            if (author is null)
+            {
+                var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+                author = new Author { FirstName = user.FirstName, LastName = user.LastName, Email = user.Email };
+            }
             var levels = await context.Levels.ToListAsync();
             var subjectCategories = await context.SubjectCategories.ToListAsync();
             if (cource.Title.Length > 50)
@@ -94,34 +103,38 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             if (ModelState.IsValid)
             {
+                cource.Author = author;
                 cource.CreationDate = DateTime.Now;
                 await context.AddAsync(cource);
                 await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
             ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
             ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
             return View(cource);
         }
 
         // GET: Cources/Edit/5
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Edit(int? id)
         {
-            var authors = await context.Authors.ToListAsync();
             var levels = await context.Levels.ToListAsync();
             var subjectCategories = await context.SubjectCategories.ToListAsync();
             if (id == null || context.Cources == null)
             {
                 return NotFound();
             }
-
-            var cource = await context.Cources.FindAsync(id);
+            var cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == id);
             if (cource == null)
             {
                 return NotFound();
             }
-            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
+            
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            if (!User.IsInRole(SettingStrings.AdminRole) && user.UserName != cource.Author.Email)
+            {
+                return RedirectToAction(nameof(Index));
+            }
             ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
             ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
             return View(cource);
@@ -132,9 +145,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,AuthorId,SubjectCategoryId,LevelId,Title,Description, CreationDate")] Cource cource)
         {
-            var authors = await context.Authors.ToListAsync();
             var levels = await context.Levels.ToListAsync();
             var subjectCategories = await context.SubjectCategories.ToListAsync();
             if (id != cource.Id)
@@ -145,6 +158,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 TempData["ErrorMessage"] = "Максимальна кількість символів для назви: 50";
                 return RedirectToAction(nameof(Edit), new {Id = id});
+            }
+            var author = await context.Authors.FirstOrDefaultAsync(a => a.Id == cource.AuthorId);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            if (!User.IsInRole(SettingStrings.AdminRole) && user.UserName != author.Email)
+            {
+                return RedirectToAction(nameof(Index));
             }
             if (ModelState.IsValid)
             {
@@ -166,13 +185,13 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AuthorId"] = new SelectList(authors, "Id", "LastName");
             ViewData["LevelId"] = new SelectList(levels, "Id", "Status");
             ViewData["SubjectCategoryId"] = new SelectList(subjectCategories, "Id", "Name");
             return View(cource);
         }
 
         // GET: Cources/Delete/5
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || context.Cources == null)
@@ -190,19 +209,33 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 return NotFound();
             }
 
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            if (!User.IsInRole(SettingStrings.AdminRole) && user.UserName != cource.Author.Email)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(cource);
         }
 
         // POST: Cources/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (context.Cources == null)
             {
                 return Problem("Entity set 'OnlineSchoolDbContext.Cources'  is null.");
             }
-            var cource = await context.Cources.FindAsync(id);
+
+            var cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == id);
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            if (!User.IsInRole(SettingStrings.AdminRole) && user.UserName != cource.Author.Email)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
             if (cource != null)
             {
                 context.Cources.Remove(cource);
@@ -212,6 +245,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize]
         public async Task<IActionResult> ExcelConverter()
         {
             var cources = await context.Cources.ToListAsync();
@@ -221,11 +255,17 @@ namespace OnlineSchoolMVCWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> ImportXl(IFormFile fileExcel)
         {
             if (ModelState.IsValid)
             {
-                Author author = await context.Authors.FirstOrDefaultAsync();
+                Author author = await context.Authors.FirstOrDefaultAsync(a => a.Email == User.Identity.Name);
+                if (author is null)
+                {
+                    var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+                    author = new Author { FirstName = user.FirstName, LastName = user.LastName, Email = user.Email };
+                }
                 try
                 {
                     await excelService.CreateCourcesByExcelFile(fileExcel, author);
@@ -241,6 +281,7 @@ namespace OnlineSchoolMVCWebApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> ExportXl(List<int> courceIds)
         {
             if (ModelState.IsValid)

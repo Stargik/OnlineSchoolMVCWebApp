@@ -43,6 +43,12 @@
                 <form class="d-flex" method="post" asp-controller="Account" asp-action="Logout">
                     <input class="btn btn-secondary m-2 my-sm-0" type="submit" value="Вихід" />
                 </form>
+                @if (User.IsInRole(SettingStrings.AdminRole))
+                {
+                    <div class="d-flex">
+                        <a class="btn btn-secondary m-2 my-sm-0" asp-area="" asp-controller="Roles" asp-action="Index">Налаштування</a>
+                </div>
+                }
             }
             else
             {

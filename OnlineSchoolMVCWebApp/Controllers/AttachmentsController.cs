@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2021.DocumentTasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +17,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
     public class AttachmentsController : Controller
     {
         private readonly OnlineSchoolDbContext context;
-
-        public AttachmentsController(OnlineSchoolDbContext context)
+        private readonly UserManager<User> userManager;
+        public AttachmentsController(OnlineSchoolDbContext context, UserManager<User> userManager)
         {
             this.context = context;
+            this.userManager = userManager;
         }
 
         // GET: Attachments
@@ -28,11 +33,13 @@ namespace OnlineSchoolMVCWebApp.Controllers
             }
             ViewBag.CourceId = courceid;
             ViewBag.CourceTitle = (await context.Cources.FirstOrDefaultAsync(t => t.Id == courceid)).Title;
+            ViewBag.CourceAuthor = (await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == courceid)).Author;
             var onlineSchoolDbContext = context.Attachments.Where(t => t.CourceId == courceid).Include(t => t.Cource);
             return View(await onlineSchoolDbContext.ToListAsync());
         }
 
         // GET: Attachments/Details/5
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || context.Attachments == null)
@@ -47,16 +54,27 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.CourceAuthor = (await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == attachment.CourceId)).Author;
             return View(attachment);
         }
 
         // GET: Attachments/Create
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Create(int? courceid)
         {
             if (courceid is null)
             {
                 return NotFound();
+            }
+            Cource cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == courceid);
+            if (cource == null)
+            {
+                return NotFound();
+            }
+
+            if (!(await HasPermition(cource)))
+            {
+                return RedirectToAction(nameof(Index));
             }
             ViewData["CourceId"] = courceid;
             return View();
@@ -67,8 +85,18 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Create([Bind("Id,CourceId,Title,Link")] Attachment attachment)
         {
+            Cource cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == attachment.CourceId);
+            if (cource == null)
+            {
+                return NotFound();
+            }
+            if (!(await HasPermition(cource)))
+            {
+                return RedirectToAction(nameof(Index));
+            }
             if (attachment.Title.Length > 50)
             {
                 TempData["ErrorMessage"] = "Максимальна кількість символів для заголовку: 50";
@@ -85,9 +113,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
         }
 
         // GET: Attachments/Edit/5
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Edit(int? id)
         {
-            var cources = await context.Cources.ToListAsync();
             if (id == null || context.Attachments == null)
             {
                 return NotFound();
@@ -98,7 +126,15 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewData["CourceId"] = new SelectList(cources, "Id", "Id", attachment.CourceId);
+            var cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == attachment.CourceId);
+            if (cource == null)
+            {
+                return NotFound();
+            }
+            if (!(await HasPermition(cource)))
+            {
+                return RedirectToAction(nameof(Index));
+            }
             return View(attachment);
         }
 
@@ -107,9 +143,9 @@ namespace OnlineSchoolMVCWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,CourceId,Title,Link")] Attachment attachment)
         {
-            var cources = await context.Cources.ToListAsync();
             if (id != attachment.Id)
             {
                 return NotFound();
@@ -118,6 +154,16 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 TempData["ErrorMessage"] = "Максимальна кількість символів для заголовку: 50";
                 return RedirectToAction(nameof(Edit), new { Id = id });
+            }
+            Cource cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == attachment.CourceId);
+            if (cource == null)
+            {
+                return NotFound();
+            }
+
+            if (!(await HasPermition(cource)))
+            {
+                return RedirectToAction(nameof(Index));
             }
             if (ModelState.IsValid)
             {
@@ -139,11 +185,11 @@ namespace OnlineSchoolMVCWebApp.Controllers
                 }
                 return RedirectToAction(nameof(Index), new { courceid = attachment.CourceId });
             }
-            ViewData["CourceId"] = new SelectList(cources, "Id", "Id", attachment.CourceId);
             return View(attachment);
         }
 
         // GET: Attachments/Delete/5
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || context.Attachments == null)
@@ -158,13 +204,22 @@ namespace OnlineSchoolMVCWebApp.Controllers
             {
                 return NotFound();
             }
-
+            var cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == attachment.CourceId);
+            if (cource == null)
+            {
+                return NotFound();
+            }
+            if (!(await HasPermition(cource)))
+            {
+                return RedirectToAction(nameof(Index));
+            }
             return View(attachment);
         }
 
         // POST: Attachments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin, author")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (context.Attachments == null)
@@ -174,6 +229,15 @@ namespace OnlineSchoolMVCWebApp.Controllers
             var attachment = await context.Attachments.FindAsync(id);
             if (attachment != null)
             {
+                var cource = await context.Cources.Include(c => c.Author).FirstOrDefaultAsync(c => c.Id == attachment.CourceId);
+                if (cource == null)
+                {
+                    return NotFound();
+                }
+                if (!(await HasPermition(cource)))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
                 context.Attachments.Remove(attachment);
             }
             
@@ -184,6 +248,12 @@ namespace OnlineSchoolMVCWebApp.Controllers
         private bool AttachmentExists(int id)
         {
           return context.Attachments.Any(e => e.Id == id);
+        }
+
+        private async Task<bool> HasPermition(Cource cource)
+        {
+            var user = await userManager.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
+            return User.IsInRole(SettingStrings.AdminRole) || user.UserName == cource.Author.Email;
         }
     }
 }

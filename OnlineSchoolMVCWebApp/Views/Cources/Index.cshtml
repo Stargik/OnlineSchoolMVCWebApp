@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<OnlineSchoolMVCWebApp.Models.Cource>
-
 @{
     ViewData["Title"] = @ViewBag.SubjectCategoryName;
     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
@@ -20,21 +19,27 @@
 
                         <p class="card-text">@Html.DisplayNameFor(model => model.SubjectCategory.Id): @Html.DisplayFor(modelItem => item.SubjectCategory.Name)</p>
                         <p class="card-text">@Html.DisplayNameFor(model => model.Level): @Html.DisplayFor(modelItem => item.Level.Status)</p>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Редагувати</a>
                         <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Докладніше</a>
-                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Видалити</a>
+                        @if (User.Identity.IsAuthenticated && (User.Identity.Name == item.Author.Email || User.IsInRole(SettingStrings.AdminRole)))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Редагувати</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-dark btn-sm">Видалити</a>
+                        }
                     </div>
                 </div>
             </div>
 
         }
     </div>
-    <div class="row row-cols-1 mt-2">
-        <div class="col">
-            <p>
-                <a asp-action="Create" class="btn btn-outline-secondary">Створити курс</a>
-                <a asp-action="ExcelConverter" class="btn btn-outline-secondary">Робота з exel-файлом</a>
-            </p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div class="row row-cols-1 mt-2">
+            <div class="col">
+                <p>
+                    <a asp-action="Create" class="btn btn-outline-secondary">Створити курс</a>
+                    <a asp-action="ExcelConverter" class="btn btn-outline-secondary">Робота з exel-файлом</a>
+                </p>
+            </div>
         </div>
-    </div>
+    }
 </div>

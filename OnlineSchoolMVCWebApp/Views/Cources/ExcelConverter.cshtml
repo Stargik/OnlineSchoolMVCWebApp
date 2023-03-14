@@ -18,17 +18,20 @@
                 <input class="btn btn-primary mt-2" type="submit" value="Вивантажити" />
             </form>
         </div>
-        <div class="col">
-            @using (Html.BeginForm("ImportXl", "Cources", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
-            {
-                <legend>Завантажте курси з excel-файлу</legend>
-                <div class="form-group">
-                    <label for="fileExcel" class="form-label">Excel-файл:</label>
-                    <input class="form-control" type="file" name="fileExcel" id="fileExcel" required>
-                </div>
-                <input class="btn btn-primary mt-2" type="submit" value="Завантажити" />
-            }
-        </div>
+        @if (User.Identity.IsAuthenticated && (User.IsInRole(SettingStrings.AuthorRole) || User.IsInRole(SettingStrings.AdminRole)))
+        {
+            <div class="col">
+                @using (Html.BeginForm("ImportXl", "Cources", FormMethod.Post, new { enctype = "multipart/form-data", id = "frm-excel" }))
+                {
+                    <legend>Завантажте курси з excel-файлу</legend>
+                    <div class="form-group">
+                        <label for="fileExcel" class="form-label">Excel-файл:</label>
+                        <input class="form-control" type="file" name="fileExcel" id="fileExcel" required>
+                    </div>
+                    <input class="btn btn-primary mt-2" type="submit" value="Завантажити" />
+                }
+            </div>
+        }
     </div>
 
     <div class="row row-cols-1 mt-2">

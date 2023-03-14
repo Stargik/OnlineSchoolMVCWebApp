@@ -8,5 +8,6 @@
         public const string AdminSettingsSection = "AdminSettings";
         public const string Email = "Email";
         public const string Password = "Password";
+        public const string AuthorRole = "author";
     }
 }

@@ -23,20 +23,19 @@ namespace OnlineSchoolMVCWebApp.Services
         {
             if (fileExcel != null)
             {
-                using (var stream = new FileStream(fileExcel.FileName, FileMode.Create))
+                using (var stream = fileExcel.OpenReadStream())
                 {
-                    await fileExcel.CopyToAsync(stream);
                     using (XLWorkbook workBook = new XLWorkbook(stream))
                     {
                         foreach (IXLWorksheet worksheet in workBook.Worksheets)
                         {
                             SubjectCategory newCategory;
 
-                            var categories = await context.SubjectCategories.Where(c => c.Name.Contains(worksheet.Name)).ToListAsync();
+                            var category = await context.SubjectCategories.Where(c => c.Name.Contains(worksheet.Name)).FirstOrDefaultAsync();
 
-                            if (categories.Count > 0)
+                            if (category is not null)
                             {
-                                newCategory = categories[0];
+                                newCategory = category;
                             }
                             else
                             {
@@ -44,7 +43,7 @@ namespace OnlineSchoolMVCWebApp.Services
                                 newCategory.Name = worksheet.Name;
                                 await context.SubjectCategories.AddAsync(newCategory);
                             }
-                            //перегляд усіх рядків                    
+                 
                             foreach (IXLRow row in worksheet.RowsUsed().Skip(1))
                             {
                                 try
